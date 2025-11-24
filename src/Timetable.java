@@ -1,18 +1,48 @@
 import java.util.*;
 
 public class Timetable {
+    private final Map<DayOfWeek, TreeMap<TimeOfDay, List<TrainingSession>>> schedule =
+            new HashMap<>();
 
-    private /* как это хранить??? */ timetable;
+    public void addNewTrainingSession(TrainingSession session) {
+        DayOfWeek day = session.getDayOfWeek();
+        TimeOfDay time = session.getTimeOfDay();
 
-    public void addNewTrainingSession(TrainingSession trainingSession) {
-        //сохраняем занятие в расписании
+        TreeMap<TimeOfDay, List<TrainingSession>> daySchedule = schedule.get(day);
+        if (daySchedule == null) {
+            daySchedule = new TreeMap<>();
+            schedule.put(day, daySchedule);
+        }
+
+        List<TrainingSession> sessionsAtTime = daySchedule.get(time);
+        if (sessionsAtTime == null) {
+            sessionsAtTime = new ArrayList<>();
+            daySchedule.put(time, sessionsAtTime);
+        }
+
+        sessionsAtTime.add(session);
     }
 
-    public /* непонятно, что возвращать */ getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
-        //как реализовать, тоже непонятно, но сложность должна быть О(1)
+    public List<TrainingSession> getTrainingSessionsForDay(DayOfWeek day) {
+        TreeMap<TimeOfDay, List<TrainingSession>> daySchedule = schedule.get(day);
+        if (daySchedule == null) {
+            return Collections.emptyList();
+        }
+
+        List<TrainingSession> allSessions = new ArrayList<>();
+        for (List<TrainingSession> sessionList : daySchedule.values()) {
+            allSessions.addAll(sessionList);
+        }
+        return allSessions;
     }
 
-    public /* непонятно, что возвращать */ getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
-        //как реализовать, тоже непонятно, но сложность должна быть О(1)
+    public List<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek day, TimeOfDay time) {
+        TreeMap<TimeOfDay, List<TrainingSession>> daySchedule = schedule.get(day);
+        if (daySchedule == null) {
+            return Collections.emptyList();
+        }
+
+        List<TrainingSession> sessions = daySchedule.get(time);
+        return (sessions != null) ? sessions : Collections.emptyList();
     }
 }

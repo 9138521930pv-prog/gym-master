@@ -32,4 +32,8 @@ public class TrainingSession {
     public TimeOfDay getTimeOfDay() {
         return timeOfDay;
     }
+    @Override
+    public String toString() {
+        return group + " с " + coach + " в " + timeOfDay;
+    }
 }
