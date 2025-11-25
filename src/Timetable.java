@@ -23,17 +23,12 @@ public class Timetable {
         sessionsAtTime.add(session);
     }
 
-    public List<TrainingSession> getTrainingSessionsForDay(DayOfWeek day) {
-        TreeMap<TimeOfDay, List<TrainingSession>> daySchedule = schedule.get(day);
-        if (daySchedule == null) {
-            return Collections.emptyList();
+    public TreeMap<TimeOfDay, List<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
+        TreeMap<TimeOfDay, List<TrainingSession>> daySchedule = schedule.get(dayOfWeek);
+        if (daySchedule != null) {
+            return daySchedule;
         }
-
-        List<TrainingSession> allSessions = new ArrayList<>();
-        for (List<TrainingSession> sessionList : daySchedule.values()) {
-            allSessions.addAll(sessionList);
-        }
-        return allSessions;
+        return new TreeMap<>();
     }
 
     public List<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek day, TimeOfDay time) {
@@ -44,5 +39,32 @@ public class Timetable {
 
         List<TrainingSession> sessions = daySchedule.get(time);
         return (sessions != null) ? sessions : Collections.emptyList();
+    }
+
+    public Map<String, Integer> getCountByCoaches() {
+        Map<String, Integer> coachCount = new HashMap<>();
+
+        for (TreeMap<TimeOfDay, List<TrainingSession>> dailySchedule : schedule.values()) {
+            for (List<TrainingSession> sessionList : dailySchedule.values()) {
+                for (TrainingSession session : sessionList) {
+                    Coach coach = session.getCoach();
+                    if (coach == null) {
+                        continue;
+                    }
+
+                    String coachName = coach.getSurname() + " " +
+                            coach.getName() + " " +
+                            coach.getMiddleName();
+
+                    if (coachCount.containsKey(coachName)) {
+                        int currentCount = coachCount.get(coachName);
+                        coachCount.put(coachName, currentCount + 1);
+                    } else {
+                        coachCount.put(coachName, 1);
+                    }
+                }
+            }
+        }
+        return coachCount;
     }
 }
