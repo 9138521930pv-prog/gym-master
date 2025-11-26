@@ -41,8 +41,8 @@ public class Timetable {
         return (sessions != null) ? sessions : Collections.emptyList();
     }
 
-    public Map<String, Integer> getCountByCoaches() {
-        Map<String, Integer> coachCount = new HashMap<>();
+    public List<CoachTrainingCount> getCountByCoaches() {
+        Map<Coach, CoachTrainingCount> coachMap = new HashMap<>();
 
         for (TreeMap<TimeOfDay, List<TrainingSession>> dailySchedule : schedule.values()) {
             for (List<TrainingSession> sessionList : dailySchedule.values()) {
@@ -52,19 +52,24 @@ public class Timetable {
                         continue;
                     }
 
-                    String coachName = coach.getSurname() + " " +
-                            coach.getName() + " " +
-                            coach.getMiddleName();
-
-                    if (coachCount.containsKey(coachName)) {
-                        int currentCount = coachCount.get(coachName);
-                        coachCount.put(coachName, currentCount + 1);
+                    CoachTrainingCount counter = coachMap.get(coach);
+                    if (counter == null) {
+                        counter = new CoachTrainingCount(coach, 1);
+                        coachMap.put(coach, counter);
                     } else {
-                        coachCount.put(coachName, 1);
+                        counter.increment();
                     }
                 }
             }
         }
-        return coachCount;
+
+        List<CoachTrainingCount> resultList = new ArrayList<>();
+        for (CoachTrainingCount counter : coachMap.values()) {
+            resultList.add(counter);
+        }
+
+        Collections.sort(resultList);
+
+        return resultList;
     }
 }
